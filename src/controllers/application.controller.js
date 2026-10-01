@@ -84,18 +84,21 @@ const getMyApplications = async (req, res) => {
 const getApplicantsByJob = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT a.id AS application_id, a.status, a.cover_letter,
-              a.applied_at, u.name, u.email, e.phone, e.location,
-              e.skills, e.experience, e.resume_url,
-              j.id AS job_id, j.title AS job_title
-       FROM applications a
-       JOIN users u ON u.id = a.employee_id
-       JOIN employees e ON e.user_id = a.employee_id
-       JOIN jobs j ON j.id = a.job_id
-       WHERE a.job_id = $1 AND j.company_id = $2
-       ORDER BY a.applied_at DESC`,
-      [req.params.jobId, req.user.id]
-    );
+  `SELECT a.id AS id, a.status, a.cover_letter,
+          a.applied_at, u.name, u.email, e.phone, e.location,
+          e.skills, e.experience, e.resume_url,
+          j.id AS job_id, j.title AS job_title
+   FROM applications a
+   JOIN users u ON u.id = a.employee_id
+   JOIN employees e ON e.user_id = a.employee_id
+   JOIN jobs j ON j.id = a.job_id
+   WHERE a.job_id = $1 AND j.company_id = $2
+   ORDER BY a.applied_at DESC`,
+  [req.params.jobId, req.user.id]
+);
+
+
+    
 
     // Also verify ownership if the job has no applicants.
     const job = await pool.query(
